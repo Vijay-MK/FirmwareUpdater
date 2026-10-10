@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.vercel/
+
+# local databases, secret keys and uploaded firmware: never commit these
+data/
+data_demo/

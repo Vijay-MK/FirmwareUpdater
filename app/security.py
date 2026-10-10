@@ -38,7 +38,12 @@ def verify_password(password: str, hashed: str) -> bool:
         return False
 
 
-def _load_or_create(name: str, factory) -> bytes:
+def _load_or_create(name: str, factory, env_name: str = "") -> bytes:
+    # A key given in the environment wins over the key file. Needed on hosts without a persistent
+    # disk (e.g. Vercel), where every server instance would otherwise create its own key.
+    from_env = os.environ.get(env_name, "").strip() if env_name else ""
+    if from_env:
+        return from_env.encode()
     path = settings.data_dir / name
     if path.exists():
         return path.read_bytes().strip()
@@ -55,12 +60,12 @@ _fernet: Fernet | None = None
 def fernet() -> Fernet:
     global _fernet
     if _fernet is None:
-        _fernet = Fernet(_load_or_create("encryption.key", Fernet.generate_key))
+        _fernet = Fernet(_load_or_create("encryption.key", Fernet.generate_key, "FWMGR_ENCRYPTION_KEY"))
     return _fernet
 
 
 def session_secret() -> str:
-    return _load_or_create("session.key", lambda: secrets.token_hex(32).encode()).decode()
+    return _load_or_create("session.key", lambda: secrets.token_hex(32).encode(), "FWMGR_SESSION_SECRET").decode()
 
 
 def encrypt_json(data: dict) -> str:

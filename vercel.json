@@ -1,14 +1,3 @@
 {
-  "builds": [
-    {
-      "src": "mrun_demo.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "run_demo.py"
-    }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.py" }]
 }

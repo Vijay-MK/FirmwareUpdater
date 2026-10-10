@@ -1,0 +1,7 @@
+# Vercel: run index.py (it seeds the simulated PLCs first) instead of app/main.py.
+[tool.vercel]
+entrypoint = "index:app"
+
+# Keep /static served by the app itself (the app adds its own security headers and the files live in app/static).
+[tool.vercel.fastapi.static]
+cdn = false

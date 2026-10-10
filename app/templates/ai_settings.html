@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>AI settings</h1>
+<div class="card">
+  <p>
+    Status:
+    {% if cfg.enabled and cfg.consent %}<span class="badge online">AI is on</span>
+    {% elif cfg.off %}<span class="badge offline">switched off</span>
+    {% elif cfg.enabled %}<span class="badge pending_approval">connected, but sharing of data is not allowed</span>
+    {% else %}<span class="badge">not configured</span>{% endif %}
+  </p>
+  <p class="small muted">
+    Connect an OpenAI-compatible service (a cloud provider such as OpenAI, Azure OpenAI, OpenRouter or Groq, or your own
+    server). It is used for <b>Explain with AI</b> on the Diagnostics page, for the release-note analysis and for the
+    AI assistant. The AI only gives advice: it never changes a PLC or starts an update.
+    {% if cfg.overridden %}Values saved here override the <code>FWMGR_LLM_*</code> environment variables.{% endif %}
+    {% if cfg.updated_by %}Last changed by {{ cfg.updated_by }}{% if cfg.updated_at %} on {{ cfg.updated_at.strftime('%Y-%m-%d %H:%M') }} UTC{% endif %}.{% endif %}
+  </p>
+</div>
+
+<form class="card" method="post" action="/ai-settings" autocomplete="off">
+  <input type="hidden" name="csrf_token" value="{{ csrf }}">
+  <div class="row">
+    <div>
+      <label for="ai-url">Base URL</label>
+      <input type="url" id="ai-url" name="base_url" required maxlength="300" value="{{ cfg.base_url }}"
+             placeholder="https://api.openai.com/v1">
+      <p class="small muted">The address up to and including <code>/v1</code>. The app adds <code>/chat/completions</code>.
+        Use <code>https://</code> for a cloud service; plain <code>http://</code> is accepted only for localhost or a private address.</p>
+    </div>
+    <div>
+      <label for="ai-model">Model</label>
+      <input type="text" id="ai-model" name="model" required maxlength="100" value="{{ cfg.model }}"
+             placeholder="gpt-4o-mini">
+      <p class="small muted">The model name or deployment name your provider expects.</p>
+    </div>
+  </div>
+  <label for="ai-key">API key</label>
+  <input type="password" id="ai-key" name="api_key" autocomplete="new-password" maxlength="500"
+         placeholder="{% if cfg.key_set %}key saved{% if cfg.key_hint %} (ends in {{ cfg.key_hint }}){% endif %}, {{ cfg.key_source }}: leave blank to keep it{% else %}paste the key{% endif %}">
+  <p class="small muted">Stored encrypted in the database and never shown again. It is not written to the audit log.
+    Leave it blank to keep the saved key. Some local servers need no key.</p>
+
+  <label class="check"><input type="checkbox" name="consent" value="true" {% if cfg.consent %}checked{% endif %}>
+    <span>I allow diagnostic and fleet text to be sent to this service.<br>
+    <span class="small muted">Diagnostics explanations send the vendor, model, firmware version, run state and the event text, never the
+    device name, IP address, serial number or location. The assistant sends device names, models and versions.
+    Without this box the AI is not used for these two features. For a cloud service, the text leaves your network.</span></span></label>
+  <label class="check"><input type="checkbox" name="off" value="true" {% if cfg.off %}checked{% endif %}>
+    <span>Switch the AI off (keeps the settings, stops every request to the service).</span></label>
+  <p><button type="submit">Save</button></p>
+</form>
+
+<h2>Check the connection</h2>
+<form class="card" method="post" action="/ai-settings/test">
+  <input type="hidden" name="csrf_token" value="{{ csrf }}">
+  <p class="small muted">Sends one harmless test message (no device or fleet data) using the <b>saved</b> settings.
+    Save first. It may use a small amount of your provider quota.</p>
+  <button type="submit" class="secondary" {% if not cfg.enabled %}disabled{% endif %}>Test connection</button>
+</form>
+
+<h2>Remove</h2>
+<div class="card">
+  <form class="inline" method="post" action="/ai-settings/remove-key">
+    <input type="hidden" name="csrf_token" value="{{ csrf }}">
+    <button type="submit" class="danger" {% if cfg.key_source != 'saved here' %}disabled{% endif %}>Remove saved API key</button>
+  </form>
+  <form class="inline" method="post" action="/ai-settings/reset">
+    <input type="hidden" name="csrf_token" value="{{ csrf }}">
+    <button type="submit" class="secondary" {% if not cfg.overridden %}disabled{% endif %}>Delete all saved AI settings</button>
+  </form>
+</div>
+<p class="small muted">Good to know: requests go from this server to the provider, so it needs outbound HTTPS access (check your
+  firewall or proxy). The key is protected by <code>encryption.key</code> in the data directory: back it up with the database and
+  keep both secure. Anyone with admin rights can replace or remove the key but cannot read it back. Prefer a provider key
+  with a spending limit and no other permissions.</p>
+{% endblock %}

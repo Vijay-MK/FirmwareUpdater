@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ device.name }} <span class="badge {{ device.status }}">{{ device.status }}</span></h1>
+<div class="card">
+  <div class="row">
+    <div><b>Vendor / model</b><br>{{ device.vendor }} {{ device.model or '-' }}</div>
+    <div><b>Address</b><br>{{ device.ip_address }}:{{ device.port }}</div>
+    <div><b>Firmware</b><br>{{ device.firmware_version or 'unknown' }}
+      <span class="muted small">({{ 'read from device' if device.version_source == 'device' else 'entered manually' }})</span></div>
+    <div><b>Serial</b><br>{{ device.serial_number or '-' }}</div>
+    <div><b>Group / location</b><br>{{ device.group_name or '-' }} / {{ device.location or '-' }}</div>
+    <div><b>Last seen</b><br>{{ device.last_seen.strftime('%Y-%m-%d %H:%M') + ' UTC' if device.last_seen else 'never' }}</div>
+  </div>
+  <p class="muted small">Driver <b>{{ device.driver }}</b>: {{ driver_notes }}</p>
+  {% if device.notes %}<p>{{ device.notes }}</p>{% endif %}
+  {% if user.has_role('engineer') %}
+  <form class="inline" method="post" action="/devices/{{ device.id }}/refresh">
+    <input type="hidden" name="csrf_token" value="{{ csrf }}"><button type="submit">Check device now</button></form>
+  <a class="btn secondary" href="/devices/{{ device.id }}/edit">Edit</a>
+  {% endif %}
+  <a class="btn secondary" href="/devices/{{ device.id }}/diagnostics">Diagnostics</a>
+  {% if user.has_role('admin') %}
+  <form class="inline" method="post" action="/devices/{{ device.id }}/delete">
+    <input type="hidden" name="csrf_token" value="{{ csrf }}"><button class="danger" type="submit">Delete</button></form>
+  {% endif %}
+</div>
+
+<h2>Available firmware</h2>
+{% if not device.firmware_version %}
+<div class="card muted">Set the installed firmware version to see available updates.</div>
+{% endif %}
+{% for r in updates %}
+<div class="card">
+  <b>{{ r.version }}</b> <span class="muted">{{ r.release_date }}</span>
+  {% if r.ai_urgency %}<span class="badge {{ r.ai_urgency }}">urgency {{ r.ai_urgency }}</span>{% endif %}
+  {% if r.ai_risk %}<span class="badge {{ r.ai_risk }}">update risk {{ r.ai_risk }}</span>{% endif %}
+  {% if r.hash_verified %}<span class="badge low">hash verified</span>{% elif r.has_file %}<span class="badge medium">hash not verified</span>{% endif %}
+  <p>{{ r.ai_summary }}</p>
+  <p class="small muted">{{ r.ai_rationale }} (advisory, source: {{ r.ai_source }})</p>
+  {% if r.cves %}<p class="small">CVEs: {{ r.cves }}</p>{% endif %}
+  {% if r.source_url %}<p class="small"><a href="{{ r.source_url }}" rel="noopener noreferrer">Vendor release page</a></p>{% endif %}
+  {% if user.has_role('engineer') %}
+    {% if r.has_file %}
+    <form method="post" action="/updates/request">
+      <input type="hidden" name="csrf_token" value="{{ csrf }}">
+      <input type="hidden" name="device_id" value="{{ device.id }}">
+      <input type="hidden" name="release_id" value="{{ r.id }}">
+      <div class="warnbox">Updating firmware can make a PLC unusable if it fails. Do not update a running process.</div>
+      <label class="check"><input type="checkbox" name="backup_confirmed" value="true"> I have backed up the PLC program and configuration.</label>
+      <label class="check"><input type="checkbox" name="window_confirmed" value="true"> A maintenance window is approved for this device.</label>
+      <label for="comment-{{ r.id }}">Comment</label>
+      <input type="text" id="comment-{{ r.id }}" name="comment" maxlength="500">
+      <p><button type="submit">Request update to {{ r.version }}</button></p>
+    </form>
+    {% else %}<p class="muted">Package not in the repository yet. Upload it on the <a href="/firmware">Firmware</a> page.</p>{% endif %}
+  {% endif %}
+</div>
+{% else %}
+{% if device.firmware_version %}<div class="card muted">No newer firmware known for this device.</div>{% endif %}
+{% endfor %}
+
+<h2>Update history</h2>
+<table>
+  <tr><th>Job</th><th>Change</th><th>Status</th><th>Requested by</th><th>Date</th></tr>
+  {% for j in jobs %}
+  <tr><td><a href="/updates/{{ j.id }}">#{{ j.id }}</a></td><td>{{ j.from_version }} &rarr; {{ j.release.version }}</td>
+    <td><span class="badge {{ j.status }}">{{ j.status }}</span></td><td>{{ j.requested_by }}</td>
+    <td>{{ j.created_at.strftime('%Y-%m-%d %H:%M') }} UTC</td></tr>
+  {% else %}<tr><td colspan="5" class="muted">No updates yet.</td></tr>{% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Audit log</h1>
+<table>
+  <tr><th>Time (UTC)</th><th>User</th><th>Action</th><th>Detail</th></tr>
+  {% for r in rows %}
+  <tr><td>{{ r.ts.strftime('%Y-%m-%d %H:%M:%S') }}</td><td>{{ r.username }}</td><td>{{ r.action }}</td><td>{{ r.detail }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

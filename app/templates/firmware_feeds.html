@@ -1,0 +1,29 @@
+{% if user.has_role('engineer') %}
+<h2>Feeds</h2>
+<table>
+  <tr><th>Vendor</th><th>Name</th><th>URL</th><th>Last check</th><th></th></tr>
+  {% for f in feeds %}
+  <tr><td>{{ f.vendor }}</td><td>{{ f.name }}</td><td class="small">{{ f.url }}</td>
+    <td class="small">{{ f.last_checked.strftime('%Y-%m-%d %H:%M') + ' UTC' if f.last_checked else '' }}<br>{{ f.last_status }}</td>
+    <td>{% if user.has_role('admin') %}<form class="inline" method="post" action="/firmware/feeds/{{ f.id }}/delete">
+      <input type="hidden" name="csrf_token" value="{{ csrf }}"><button class="danger" type="submit">Remove</button></form>{% endif %}</td></tr>
+  {% else %}<tr><td colspan="5" class="muted">No feeds configured.</td></tr>{% endfor %}
+</table>
+<form class="inline" method="post" action="/firmware/check">
+  <input type="hidden" name="csrf_token" value="{{ csrf }}"><p><button type="submit">Check feeds now</button></p></form>
+{% endif %}
+
+{% if user.has_role('admin') %}
+<h2>Add a feed</h2>
+<form class="card" method="post" action="/firmware/feeds/add">
+  <input type="hidden" name="csrf_token" value="{{ csrf }}">
+  <div class="row">
+    <div><label for="f-vendor">Vendor</label>
+      <select id="f-vendor" name="vendor">{% for v in vendors %}<option value="{{ v }}">{{ v }}</option>{% endfor %}</select></div>
+    <div><label for="f-name">Name</label><input type="text" id="f-name" name="name" required></div>
+    <div><label for="f-url">Feed URL (JSON)</label><input type="url" id="f-url" name="url" required></div>
+    <div><label for="f-token">Bearer token (optional)</label><input type="password" id="f-token" name="token" autocomplete="off"></div>
+  </div>
+  <p><button type="submit">Add feed</button></p>
+</form>
+{% endif %}

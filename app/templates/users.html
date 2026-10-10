@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Users</h1>
+<p class="muted small">Roles: viewer (read only) &lt; engineer (manage devices, firmware, request updates) &lt;
+approver (also approves updates) &lt; admin (also users, feeds, deletion, audit log).</p>
+<table>
+  <tr><th>User</th><th>Role</th><th>Active</th><th>New password</th><th></th></tr>
+  {% for u in users %}
+  <tr>
+    <td>{{ u.username }}
+      <form id="uf-{{ u.id }}" method="post" action="/users/{{ u.id }}/update">
+        <input type="hidden" name="csrf_token" value="{{ csrf }}"></form></td>
+    <td><select form="uf-{{ u.id }}" name="role" aria-label="Role">{% for r in roles %}<option value="{{ r }}" {% if r == u.role %}selected{% endif %}>{{ r }}</option>{% endfor %}</select></td>
+    <td><input form="uf-{{ u.id }}" type="checkbox" name="active" value="true" {% if u.active %}checked{% endif %} aria-label="Active"></td>
+    <td><input form="uf-{{ u.id }}" type="password" name="new_password" autocomplete="new-password" aria-label="New password" placeholder="leave blank to keep"></td>
+    <td><button form="uf-{{ u.id }}" type="submit">Save</button></td>
+  </tr>
+  {% endfor %}
+</table>
+<h2>Add user</h2>
+<form class="card" method="post" action="/users/new">
+  <input type="hidden" name="csrf_token" value="{{ csrf }}">
+  <div class="row">
+    <div><label for="n-user">Username</label><input type="text" id="n-user" name="username" required maxlength="64"></div>
+    <div><label for="n-pass">Password (min. 10 characters)</label><input type="password" id="n-pass" name="password" required autocomplete="new-password"></div>
+    <div><label for="n-role">Role</label><select id="n-role" name="role">{% for r in roles %}<option value="{{ r }}">{{ r }}</option>{% endfor %}</select></div>
+  </div>
+  <p><button type="submit">Create user</button></p>
+</form>
+{% endblock %}

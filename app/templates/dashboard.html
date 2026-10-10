@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Dashboard</h1>
+<div class="grid">
+  <div class="stat"><b>{{ total }}</b>Devices</div>
+  <div class="stat"><b>{{ outdated|length }}</b>With firmware updates available</div>
+  <div class="stat"><b>{{ offline }}</b>Offline</div>
+  <div class="stat"><b>{{ pending|length }}</b>Awaiting approval</div>
+  <div class="stat"><b>{{ releases }}</b>Firmware releases known</div>
+</div>
+
+<h2>Devices that can be updated</h2>
+{% if outdated %}
+<table>
+  <tr><th>Device</th><th>Vendor / model</th><th>Installed</th><th>Newest available</th><th>Urgency</th></tr>
+  {% for d, ups in outdated %}
+  <tr>
+    <td><a href="/devices/{{ d.id }}">{{ d.name }}</a></td>
+    <td>{{ d.vendor }} {{ d.model }}</td>
+    <td>{{ d.firmware_version }}</td>
+    <td>{{ ups[0].version }}</td>
+    <td>{% if ups[0].ai_urgency %}<span class="badge {{ ups[0].ai_urgency }}">{{ ups[0].ai_urgency }}</span>{% endif %}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<div class="card muted">All devices with a known firmware version are up to date with the catalog.</div>
+{% endif %}
+
+{% if pending %}
+<h2>Updates awaiting approval</h2>
+<table>
+  <tr><th>Job</th><th>Device</th><th>Change</th><th>Requested by</th></tr>
+  {% for j in pending %}
+  <tr><td><a href="/updates/{{ j.id }}">#{{ j.id }}</a></td><td>{{ j.device.name }}</td>
+      <td>{{ j.from_version }} &rarr; {{ j.release.version }}</td><td>{{ j.requested_by }}</td></tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+<h2>Latest notifications</h2>
+{% for n in recent %}
+<div class="card">{{ n.message }} <span class="muted small">{{ n.created_at.strftime('%Y-%m-%d %H:%M') }} UTC</span></div>
+{% else %}
+<div class="card muted">No notifications yet.</div>
+{% endfor %}
+{% endblock %}

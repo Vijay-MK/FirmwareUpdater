@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ 'Edit device' if device else 'Add device' }}</h1>
+<div class="card">
+<form method="post" action="{{ '/devices/%d/edit' % device.id if device else '/devices/new' }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf }}">
+  <div class="row">
+    <div><label for="name">Name</label>
+      <input type="text" id="name" name="name" required maxlength="100" value="{{ device.name if device else '' }}"></div>
+    <div><label for="group_name">Group / line</label>
+      <input type="text" id="group_name" name="group_name" maxlength="100" value="{{ device.group_name if device else '' }}"></div>
+    <div><label for="location">Location</label>
+      <input type="text" id="location" name="location" maxlength="200" value="{{ device.location if device else '' }}"></div>
+  </div>
+  <div class="row">
+    <div><label for="vendor">Vendor</label>
+      {% if device %}<input type="text" id="vendor" value="{{ device.vendor }}" disabled>
+      {% else %}
+      <select id="vendor" name="vendor" required>
+        {% for v in vendors %}<option value="{{ v }}">{{ v }}</option>{% endfor %}
+      </select>{% endif %}</div>
+    <div><label for="driver">Driver</label>
+      {% if device %}<input type="text" id="driver" value="{{ device.driver }}" disabled>
+      {% else %}
+      <select id="driver" name="driver" required>
+        {% for v in vendors %}<option value="{{ v|lower }}">{{ v|lower }}</option>{% endfor %}
+        <option value="simulator">simulator (demo, no network)</option>
+      </select>{% endif %}</div>
+    <div><label for="model">Model (used to match firmware)</label>
+      <input type="text" id="model" name="model" maxlength="100" placeholder="e.g. S7-1500 CPU 1516" value="{{ device.model if device else '' }}"></div>
+  </div>
+  <div class="row">
+    <div><label for="ip_address">IP address</label>
+      <input type="text" id="ip_address" name="ip_address" required value="{{ device.ip_address if device else '' }}"></div>
+    <div><label for="port">Port</label>
+      <input type="number" id="port" name="port" required min="1" max="65535" value="{{ device.port if device else '' }}"></div>
+    <div><label for="firmware_version">Installed firmware version</label>
+      <input type="text" id="firmware_version" name="firmware_version" maxlength="64" value="{{ device.firmware_version if device else '' }}"></div>
+  </div>
+  <p class="small muted">Default ports: {% for v, p in ports.items() %}{{ v }} {{ p }}{% if not loop.last %}, {% endif %}{% endfor %}.
+    Rockwell devices report their version automatically; for other vendors enter it manually.
+    Choose the driver matching the vendor.</p>
+  <div class="row">
+    <div><label for="username">Device username (optional)</label>
+      <input type="text" id="username" name="username" autocomplete="off"></div>
+    <div><label for="password">Device password (optional)</label>
+      <input type="password" id="password" name="password" autocomplete="new-password"></div>
+  </div>
+  {% if device %}<p class="small muted">Leave credentials blank to keep the stored ones. They are encrypted at rest.</p>{% endif %}
+  <label for="notes">Notes</label>
+  <textarea id="notes" name="notes" maxlength="2000">{{ device.notes if device else '' }}</textarea>
+  <p><button type="submit">Save</button>
+     <a class="btn secondary" href="{{ '/devices/%d' % device.id if device else '/devices' }}">Cancel</a></p>
+</form>
+</div>
+{% endblock %}

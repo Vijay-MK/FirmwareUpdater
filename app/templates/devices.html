@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Devices</h1>
+<div class="card">
+  <form method="get" action="/devices" class="row">
+    <div><label for="q">Search</label><input type="text" id="q" name="q" value="{{ q }}" placeholder="name, IP, model, group"></div>
+    <div><label for="vendor">Vendor</label>
+      <select id="vendor" name="vendor"><option value="">All</option>
+        {% for v in vendors %}<option value="{{ v }}" {% if v == vendor %}selected{% endif %}>{{ v }}</option>{% endfor %}
+      </select></div>
+    <div><label>&nbsp;</label><button type="submit">Filter</button></div>
+  </form>
+  <p>
+    {% if user.has_role('engineer') %}
+    <a class="btn" href="/devices/new">Add device</a>
+    <form class="inline" method="post" action="/devices/refresh-all">
+      <input type="hidden" name="csrf_token" value="{{ csrf }}">
+      <button class="secondary" type="submit">Refresh all</button>
+    </form>
+    {% endif %}
+  </p>
+</div>
+<table>
+  <tr><th>Name</th><th>Group</th><th>Vendor / model</th><th>Address</th><th>Firmware</th><th>Status</th><th>Update</th></tr>
+  {% for d in devices %}
+  <tr>
+    <td><a href="/devices/{{ d.id }}">{{ d.name }}</a></td>
+    <td>{{ d.group_name }}</td>
+    <td>{{ d.vendor }} {{ d.model }}</td>
+    <td>{{ d.ip_address }}:{{ d.port }}</td>
+    <td>{{ d.firmware_version or '?' }}
+      <span class="muted small">({{ 'read from device' if d.version_source == 'device' else 'entered manually' }})</span></td>
+    <td><span class="badge {{ d.status }}">{{ d.status }}</span></td>
+    <td>{% if updates[d.id] %}<span class="badge medium">{{ updates[d.id][0].version }} available</span>{% endif %}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="7" class="muted">No devices yet.</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block content %}
+<p><a href="/devices/{{ device.id }}">&larr; {{ device.name }}</a></p>
+<h1>Diagnostics: {{ device.name }}</h1>
+
+<div class="card">
+  <div class="row">
+    <div><b>Vendor / model</b><br>{{ device.vendor }} {{ device.model or '-' }}</div>
+    <div><b>Address</b><br>{{ device.ip_address }}:{{ device.port }}</div>
+    <div><b>Firmware</b><br>{{ device.firmware_version or 'unknown' }}</div>
+    <div><b>Serial</b><br>{{ device.serial_number or '-' }}</div>
+    <div><b>Group / location</b><br>{{ device.group_name or '-' }} / {{ device.location or '-' }}</div>
+  </div>
+  <p class="muted small">Driver <b>{{ device.driver }}</b>: {{ driver_notes }}</p>
+  {% if user.has_role('engineer') %}
+  <form class="inline" method="post" action="/devices/{{ device.id }}/diagnostics/run">
+    <input type="hidden" name="csrf_token" value="{{ csrf }}">
+    <button type="submit">Run diagnostics now</button>
+  </form>
+  <span class="muted small">Read-only: nothing is written to the PLC.</span>
+  {% endif %}
+</div>
+
+{% if not snap %}
+<div class="card muted">No diagnostics have been collected for this device yet.</div>
+{% else %}
+<h2>Device state
+  <span class="muted small">as of {{ snap.collected_at.strftime('%Y-%m-%d %H:%M:%S') }} UTC, by {{ snap.collected_by or 'n/a' }}
+  {% if not is_latest %}(older snapshot &ndash; <a href="/devices/{{ device.id }}/diagnostics">show latest</a>){% endif %}</span></h2>
+<div class="card">
+  <div class="row">
+    <div><b>Connection</b><br><span class="badge {{ 'online' if snap.reachable else 'offline' }}">{{ 'reachable' if snap.reachable else 'not reachable' }}</span></div>
+    <div><b>Run state</b><br><span class="badge s-{{ snap.run_state }}">{{ snap.run_state }}</span></div>
+    <div><b>Health</b><br><span class="badge h-{{ snap.health }}">{{ snap.health }}</span></div>
+    <div><b>Response time</b><br>{{ '%.1f ms' % snap.latency_ms if snap.latency_ms is not none else '-' }}</div>
+  </div>
+  {% if snap.run_state == 'unknown' and snap.reachable %}
+  <p class="muted small">This driver cannot read the RUN/STOP state, so it is shown as unknown. Treat it as possibly running.</p>
+  {% endif %}
+</div>
+
+{% for note in data.notes %}<div class="warnbox">{{ note }}</div>{% endfor %}
+
+<h2>Details</h2>
+<table>
+  {% for key, value in data.facts.items() %}<tr><th>{{ key }}</th><td>{{ value }}</td></tr>
+  {% else %}<tr><td class="muted">No details available.</td></tr>{% endfor %}
+</table>
+
+<h2>Diagnostic buffer</h2>
+{% if not data.events_available and not data.events %}
+<div class="card muted">The device's diagnostic buffer was not read. See the notes above for how to enable it for this vendor.</div>
+{% else %}
+<p class="small">
+  Filter:
+  <a href="/devices/{{ device.id }}/diagnostics?snapshot={{ snap.id }}">all ({{ data.events|length }})</a> |
+  <a href="/devices/{{ device.id }}/diagnostics?snapshot={{ snap.id }}&amp;severity=error">errors ({{ counts.error }})</a> |
+  <a href="/devices/{{ device.id }}/diagnostics?snapshot={{ snap.id }}&amp;severity=warning">warnings ({{ counts.warning }})</a> |
+  <a href="/devices/{{ device.id }}/diagnostics?snapshot={{ snap.id }}&amp;severity=info">info ({{ counts.info }})</a>
+</p>
+<table>
+  <tr><th>Time</th><th>Severity</th><th>Code</th><th>Message</th><th>Source</th></tr>
+  {% for e in events %}
+  <tr><td>{{ e.timestamp or '-' }}</td><td><span class="badge e-{{ e.severity }}">{{ e.severity }}</span></td>
+    <td>{{ e.code or '-' }}</td><td>{{ e.message }}</td><td>{{ e.source or '-' }}</td></tr>
+  {% else %}<tr><td colspan="5" class="muted">{{ 'No events match this filter.' if severity else 'The diagnostic buffer is empty.' }}</td></tr>{% endfor %}
+</table>
+{% endif %}
+
+<h2>Help: what to check and how to fix</h2>
+<div class="card">
+  <p><b>{{ help.overall }}</b></p>
+  <p class="muted small">Built-in guidance matched to the event text. {{ help.disclaimer }}</p>
+</div>
+
+{% if ai_advice %}
+<div class="card aibox">
+  <h3>AI explanation <span class="muted small">model {{ ai_model }}, advisory only</span></h3>
+  {% if ai_advice.summary %}<p>{{ ai_advice.summary }}</p>{% endif %}
+  {% if ai_advice.likely_root_cause %}<p><b>Likely root cause:</b> {{ ai_advice.likely_root_cause }}</p>{% endif %}
+  {% if ai_advice.actions %}<ol>{% for a in ai_advice.actions %}<li>{{ a }}</li>{% endfor %}</ol>{% endif %}
+  {% if ai_advice.escalate %}<p class="warnbox">The AI suggests involving the vendor or a qualified engineer.</p>{% endif %}
+</div>
+{% endif %}
+{% if user.has_role('engineer') %}
+<form class="inline" method="post" action="/devices/{{ device.id }}/diagnostics/{{ snap.id }}/explain">
+  <input type="hidden" name="csrf_token" value="{{ csrf }}">
+  <button type="submit" {% if not ai_available %}disabled title="An administrator must configure AI under AI settings"{% endif %}>{{ 'Refresh' if ai_advice else 'Explain with AI' }}</button>
+</form>
+<span class="muted small">{% if ai_available %}Sends the event text (not the device name, address or serial) to the configured LLM.{% else %}AI is not configured; the built-in guidance above is used.{% endif %}</span>
+{% endif %}
+
+{% for issue in help.issues %}
+<div class="card issue sev-{{ issue.severity }}">
+  <h3><span class="badge e-{{ issue.severity }}">{{ issue.severity }}</span> {{ issue.title }}
+    {% if issue.count %}<span class="muted small">({{ issue.count }} event{{ 's' if issue.count != 1 }})</span>{% endif %}
+    {% if issue.vendor_specific %}<span class="badge">{{ device.vendor }}</span>{% endif %}</h3>
+  {% if issue.events %}
+  <ul class="small">{% for e in issue.events %}<li>{{ e.timestamp }} {{ e.code }} {{ e.message }}</li>{% endfor %}</ul>
+  {% endif %}
+  <div class="row">
+    <div><b>Probable causes</b><ul>{% for c in issue.causes %}<li>{{ c }}</li>{% endfor %}</ul></div>
+    <div><b>What to do</b><ol>{% for s in issue.steps %}<li>{{ s }}</li>{% endfor %}</ol></div>
+  </div>
+  {% if issue.caution %}<p class="warnbox">{{ issue.caution }}</p>{% endif %}
+  {% if issue.escalate %}<p class="small"><b>Involve the vendor support or your security/controls engineer.</b></p>{% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
+<h2>History</h2>
+<table>
+  <tr><th>Collected (UTC)</th><th>By</th><th>Connection</th><th>Run state</th><th>Health</th><th></th></tr>
+  {% for s in snaps %}
+  <tr><td>{{ s.collected_at.strftime('%Y-%m-%d %H:%M:%S') }}</td><td>{{ s.collected_by or '-' }}</td>
+    <td><span class="badge {{ 'online' if s.reachable else 'offline' }}">{{ 'reachable' if s.reachable else 'not reachable' }}</span></td>
+    <td>{{ s.run_state }}</td><td><span class="badge h-{{ s.health }}">{{ s.health }}</span></td>
+    <td><a href="/devices/{{ device.id }}/diagnostics?snapshot={{ s.id }}">view</a></td></tr>
+  {% else %}<tr><td colspan="6" class="muted">No history yet.</td></tr>{% endfor %}
+</table>
+{% endblock %}

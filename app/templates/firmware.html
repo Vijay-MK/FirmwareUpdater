@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Firmware catalog</h1>
+<div class="card small muted">
+  Vendors do not offer one public firmware API, and most downloads require a vendor account and licence acceptance.
+  Add releases manually (with the vendor's published SHA-256), or register a JSON feed below. Packages are only
+  flashed from this local repository, after hash verification and approval.
+</div>
+
+<form method="get" action="/firmware" class="card row">
+  <div><label for="vendor">Filter by vendor</label>
+    <select id="vendor" name="vendor"><option value="">All</option>
+      {% for v in vendors %}<option value="{{ v }}" {% if v == vendor %}selected{% endif %}>{{ v }}</option>{% endfor %}
+    </select></div>
+  <div><label>&nbsp;</label><button type="submit">Filter</button></div>
+</form>
+
+<table>
+  <tr><th>Vendor</th><th>Version</th><th>Models</th><th>AI analysis (advisory)</th><th>Package</th><th>Actions</th></tr>
+  {% for r in releases %}
+  <tr>
+    <td>{{ r.vendor }}</td>
+    <td><b>{{ r.version }}</b><br><span class="muted small">{{ r.release_date }}</span></td>
+    <td>{{ r.model_pattern }}</td>
+    <td>
+      {% if r.ai_urgency %}<span class="badge {{ r.ai_urgency }}">urgency {{ r.ai_urgency }}</span>
+      <span class="badge {{ r.ai_risk }}">risk {{ r.ai_risk }}</span>{% endif %}
+      <div class="small">{{ r.ai_summary }}</div>
+      {% if r.cves %}<div class="small">CVEs: {{ r.cves }}</div>{% endif %}
+      <div class="small muted">source: {{ r.ai_source }}; origin: {{ r.source }}</div>
+    </td>
+    <td>
+      {% if r.has_file %}stored<br><span class="small muted">sha256 {{ r.sha256[:16] }}&hellip;</span><br>
+        {% if r.hash_verified %}<span class="badge low">hash verified</span>{% else %}<span class="badge medium">hash not verified</span>{% endif %}
+      {% else %}<span class="muted">not stored</span>{% endif %}
+    </td>
+    <td>
+      {% if user.has_role('engineer') %}
+      <form method="post" action="/firmware/{{ r.id }}/upload" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf }}">
+        <input type="file" name="package" required aria-label="Firmware package">
+        <input type="text" name="expected_sha256" placeholder="published SHA-256 (optional)" aria-label="Published SHA-256">
+        <button class="secondary" type="submit">Upload</button>
+      </form>
+      {% if r.download_url and not r.has_file %}
+      <form class="inline" method="post" action="/firmware/{{ r.id }}/download">
+        <input type="hidden" name="csrf_token" value="{{ csrf }}"><button class="secondary" type="submit">Download &amp; verify</button></form>
+      {% endif %}
+      <form class="inline" method="post" action="/firmware/{{ r.id }}/reanalyze">
+        <input type="hidden" name="csrf_token" value="{{ csrf }}"><button class="secondary" type="submit">Re-analyze</button></form>
+      {% endif %}
+    </td>
+  </tr>
+  {% else %}<tr><td colspan="6" class="muted">No firmware releases yet.</td></tr>{% endfor %}
+</table>
+
+{% if user.has_role('engineer') %}
+<h2>Add a release</h2>
+<form class="card" method="post" action="/firmware/add" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{ csrf }}">
+  <div class="row">
+    <div><label for="a-vendor">Vendor</label>
+      <select id="a-vendor" name="vendor" required>{% for v in vendors %}<option value="{{ v }}">{{ v }}</option>{% endfor %}</select></div>
+    <div><label for="a-version">Version</label><input type="text" id="a-version" name="version" required placeholder="4.2.1"></div>
+    <div><label for="a-pattern">Model pattern</label><input type="text" id="a-pattern" name="model_pattern" value="*" placeholder="S7-1500*"></div>
+    <div><label for="a-date">Release date</label><input type="text" id="a-date" name="release_date" placeholder="2025-01-31"></div>
+  </div>
+  <label for="a-url">Vendor release page URL</label><input type="url" id="a-url" name="source_url">
+  <label for="a-sha">Published SHA-256 (from the vendor)</label><input type="text" id="a-sha" name="expected_sha256" maxlength="64">
+  <label for="a-notes">Release notes (paste text; used for AI analysis)</label><textarea id="a-notes" name="release_notes"></textarea>
+  <label for="a-file">Firmware package (optional now, required before an update)</label><input type="file" id="a-file" name="package">
+  <p><button type="submit">Add release</button></p>
+</form>
+{% endif %}
+
+{% include "firmware_feeds.html" %}
+{% endblock %}

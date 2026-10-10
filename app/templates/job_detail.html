@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Update job #{{ job.id }} <span class="badge {{ job.status }}">{{ job.status }}</span></h1>
+<div class="card">
+  <div class="row">
+    <div><b>Device</b><br><a href="/devices/{{ job.device_id }}">{{ job.device.name }}</a></div>
+    <div><b>Change</b><br>{{ job.from_version }} &rarr; {{ job.release.version }}</div>
+    <div><b>Requested by</b><br>{{ job.requested_by }}</div>
+    <div><b>Approved by</b><br>{{ job.approved_by or '-' }}</div>
+    <div><b>Package hash</b><br>{% if job.release.hash_verified %}<span class="badge low">verified</span>{% else %}<span class="badge medium">not verified</span>{% endif %}
+      <span class="small muted">{{ job.release.sha256[:16] }}&hellip;</span></div>
+  </div>
+  {% if job.comment %}<p>Comment: {{ job.comment }}</p>{% endif %}
+
+  {% if job.status == 'pending_approval' and user.has_role('approver') %}
+  <form method="post" action="/updates/{{ job.id }}/approve">
+    <input type="hidden" name="csrf_token" value="{{ csrf }}">
+    {% if not job.release.hash_verified %}
+    <label class="check"><input type="checkbox" name="acknowledge_unverified" value="true">
+      The package hash is NOT verified against a vendor-published SHA-256. I verified integrity another way.</label>
+    {% endif %}
+    <p><button type="submit">Approve</button></p>
+  </form>
+  {% endif %}
+  {% if job.status == 'approved' and user.has_role('engineer') %}
+  <form method="post" action="/updates/{{ job.id }}/start">
+    <input type="hidden" name="csrf_token" value="{{ csrf }}">
+    <div class="warnbox">Starting runs pre-flight checks and then flashes the PLC. It stops if the PLC is in RUN.</div>
+    <button type="submit">Start update</button>
+  </form>
+  {% endif %}
+  {% if job.status in ('pending_approval', 'approved') %}
+  <form class="inline" method="post" action="/updates/{{ job.id }}/reject">
+    <input type="hidden" name="csrf_token" value="{{ csrf }}"><button class="danger" type="submit">Cancel / reject</button></form>
+  {% endif %}
+  {% if job.status == 'needs_verification' and user.has_role('engineer') %}
+  <form method="post" action="/updates/{{ job.id }}/confirm">
+    <input type="hidden" name="csrf_token" value="{{ csrf }}">
+    <label for="version">Firmware version you read on the device</label>
+    <input type="text" id="version" name="version" required>
+    <p><button type="submit">Confirm</button></p>
+  </form>
+  {% endif %}
+  {% if job.status == 'running' %}<p class="muted">Running. Reload this page to see new log lines.</p>{% endif %}
+</div>
+<h2>Log</h2>
+<pre class="log">{{ job.log }}</pre>
+{% endblock %}

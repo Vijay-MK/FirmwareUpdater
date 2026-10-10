@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>AI assistant</h1>
+<div class="card small muted">
+  Ask questions about your fleet, e.g. "Which Siemens devices have a newer firmware?". Answers are advisory and can be wrong;
+  verify against the vendor release notes. The assistant never starts an update.
+</div>
+<form class="card" method="post" action="/assistant">
+  <input type="hidden" name="csrf_token" value="{{ csrf }}">
+  <label for="question">Question</label>
+  <input type="text" id="question" name="question" required maxlength="1000" value="{{ question }}">
+  <p><button type="submit">Ask</button></p>
+</form>
+{% if answer %}<div class="card"><pre class="log">{{ answer }}</pre></div>{% endif %}
+{% endblock %}

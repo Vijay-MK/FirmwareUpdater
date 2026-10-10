@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}PLC Firmware Manager{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+{% if user %}
+<header>
+  <span class="brand">PLC Firmware Manager</span>
+  <nav>
+    <a href="/">Dashboard</a>
+    <a href="/devices">Devices</a>
+    <a href="/firmware">Firmware</a>
+    <a href="/updates">Updates</a>
+    <a href="/notifications">Notifications{% if unread %} ({{ unread }}){% endif %}</a>
+    <a href="/assistant">AI Assistant</a>
+    {% if user.has_role('admin') %}<a href="/users">Users</a><a href="/ai-settings">AI settings</a><a href="/audit">Audit log</a>{% endif %}
+  </nav>
+  <a href="/account">{{ user.username }} ({{ user.role }})</a>
+  <form method="post" action="/logout">
+    <input type="hidden" name="csrf_token" value="{{ csrf }}">
+    <button class="secondary" type="submit">Log out</button>
+  </form>
+</header>
+{% endif %}
+<main>
+  {% if flash %}<div class="flash {{ flash.kind }}">{{ flash.msg }}</div>{% endif %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

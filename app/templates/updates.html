@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Update jobs</h1>
+<table>
+  <tr><th>Job</th><th>Device</th><th>Change</th><th>Status</th><th>Requested by</th><th>Approved by</th><th>Date</th></tr>
+  {% for j in jobs %}
+  <tr>
+    <td><a href="/updates/{{ j.id }}">#{{ j.id }}</a></td>
+    <td><a href="/devices/{{ j.device_id }}">{{ j.device.name }}</a></td>
+    <td>{{ j.from_version }} &rarr; {{ j.release.version }}</td>
+    <td><span class="badge {{ j.status }}">{{ j.status }}</span></td>
+    <td>{{ j.requested_by }}</td><td>{{ j.approved_by or '-' }}</td>
+    <td>{{ j.created_at.strftime('%Y-%m-%d %H:%M') }} UTC</td>
+  </tr>
+  {% else %}<tr><td colspan="7" class="muted">No update jobs yet.</td></tr>{% endfor %}
+</table>
+{% endblock %}

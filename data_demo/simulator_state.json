@@ -1,0 +1,608 @@
+{
+ "10.250.1.11:102": {
+  "version": "V2.9.4",
+  "run_state": "stop",
+  "online": true,
+  "health": "fault",
+  "model": "CPU 1516-3 PN/DP",
+  "serial": "SIM-S7-0001",
+  "hardware": "FS 05",
+  "latency_ms": 6.2,
+  "facts": {
+   "Operating mode": "STOP",
+   "CPU load": "0 %",
+   "Cycle time (min/avg/max)": "1 / 6 / 48 ms",
+   "Work memory used": "71 %",
+   "Load memory used": "38 %",
+   "PROFINET devices": "12 configured, 12 online",
+   "Last restart": "warm restart, 9 h ago"
+  },
+  "events": [
+   {
+    "timestamp": "2026-10-10 09:46:06",
+    "severity": "warning",
+    "code": "16#3A01",
+    "message": "I/O access error: module in slot 4 (DQ 16x24VDC) not reachable",
+    "source": "Rack 0"
+   },
+   {
+    "timestamp": "2026-10-10 09:45:06",
+    "severity": "error",
+    "code": "OB121",
+    "message": "Programming error: DB 12 'RecipeData' not loaded, access to DB12.DBW40",
+    "source": "FC_Recipe"
+   },
+   {
+    "timestamp": "2026-10-10 09:45:06",
+    "severity": "error",
+    "code": "16#4A02",
+    "message": "CPU changed from RUN to STOP: programming error without error OB",
+    "source": "CPU"
+   },
+   {
+    "timestamp": "2026-10-10 08:24:06",
+    "severity": "info",
+    "code": "16#4301",
+    "message": "Download of block FC_Recipe completed",
+    "source": "CPU"
+   },
+   {
+    "timestamp": "2026-10-10 08:23:06",
+    "severity": "info",
+    "code": "16#4302",
+    "message": "CPU changed from STOP to RUN",
+    "source": "CPU"
+   },
+   {
+    "timestamp": "2026-10-10 00:59:06",
+    "severity": "info",
+    "code": "16#4300",
+    "message": "Power on, warm restart",
+    "source": "CPU"
+   }
+  ],
+  "notes": []
+ },
+ "10.250.1.12:102": {
+  "version": "V4.5.2",
+  "run_state": "run",
+  "online": true,
+  "health": "warning",
+  "model": "CPU 1214C DC/DC/DC",
+  "serial": "SIM-S7-0002",
+  "hardware": "FS 03",
+  "latency_ms": 8.9,
+  "facts": {
+   "Operating mode": "RUN",
+   "CPU load": "34 %",
+   "Cycle time (min/avg/max)": "1 / 3 / 11 ms",
+   "PROFINET devices": "6 configured, 5 online",
+   "Memory card": "SIMATIC MC 4 MB, 41 % used"
+  },
+  "events": [
+   {
+    "timestamp": "2026-10-10 09:24:06",
+    "severity": "warning",
+    "code": "16#3C02",
+    "message": "IO device 'drive-03' failed (PROFINET), station 5 not reachable",
+    "source": "PROFINET IO"
+   },
+   {
+    "timestamp": "2026-10-10 06:34:06",
+    "severity": "info",
+    "code": "16#3C03",
+    "message": "IO device 'drive-03' returned",
+    "source": "PROFINET IO"
+   },
+   {
+    "timestamp": "2026-10-10 06:29:06",
+    "severity": "warning",
+    "code": "16#3C02",
+    "message": "IO device 'drive-03' failed (PROFINET), station 5 not reachable",
+    "source": "PROFINET IO"
+   },
+   {
+    "timestamp": "2026-10-09 20:39:06",
+    "severity": "info",
+    "code": "16#4300",
+    "message": "Power on, warm restart",
+    "source": "CPU"
+   }
+  ],
+  "notes": []
+ },
+ "10.250.1.13:102": {
+  "version": "V2.9.2",
+  "run_state": "run",
+  "online": true,
+  "health": "warning",
+  "model": "CPU 1511-1 PN",
+  "serial": "SIM-S7-0003",
+  "hardware": "FS 04",
+  "latency_ms": 7.4,
+  "facts": {
+   "Operating mode": "RUN",
+   "CPU load": "22 %",
+   "Access level": "Full access protected",
+   "Web server": "enabled, HTTPS",
+   "Clock source": "NTP, last sync 3 h ago"
+  },
+  "events": [
+   {
+    "timestamp": "2026-10-10 09:50:06",
+    "severity": "warning",
+    "code": "SEC-401",
+    "message": "Login failed for user 'admin' from 10.250.9.77 (web server)",
+    "source": "Web server"
+   },
+   {
+    "timestamp": "2026-10-10 09:49:06",
+    "severity": "warning",
+    "code": "SEC-401",
+    "message": "Login failed for user 'admin' from 10.250.9.77 (web server)",
+    "source": "Web server"
+   },
+   {
+    "timestamp": "2026-10-10 09:48:06",
+    "severity": "warning",
+    "code": "SEC-401",
+    "message": "Login failed for user 'service' from 10.250.9.77 (web server)",
+    "source": "Web server"
+   },
+   {
+    "timestamp": "2026-10-10 06:59:06",
+    "severity": "warning",
+    "code": "NTP-12",
+    "message": "NTP server 10.250.0.5 not reachable, time sync lost",
+    "source": "Time sync"
+   },
+   {
+    "timestamp": "2026-10-09 08:59:06",
+    "severity": "info",
+    "code": "16#4300",
+    "message": "Power on, warm restart",
+    "source": "CPU"
+   }
+  ],
+  "notes": []
+ },
+ "10.250.1.14:102": {
+  "version": "V2.8.1",
+  "run_state": "run",
+  "online": true,
+  "health": "ok",
+  "model": "CPU 1513-1 PN",
+  "serial": "SIM-S7-0004",
+  "hardware": "FS 04",
+  "latency_ms": 4.8,
+  "facts": {
+   "Operating mode": "RUN",
+   "CPU load": "18 %",
+   "Cycle time (min/avg/max)": "1 / 2 / 7 ms",
+   "PROFINET devices": "4 configured, 4 online"
+  },
+  "events": [
+   {
+    "timestamp": "2026-10-08 18:00:06",
+    "severity": "info",
+    "code": "16#4302",
+    "message": "CPU changed from STOP to RUN",
+    "source": "CPU"
+   },
+   {
+    "timestamp": "2026-10-08 17:59:06",
+    "severity": "info",
+    "code": "16#4300",
+    "message": "Power on, warm restart",
+    "source": "CPU"
+   }
+  ],
+  "notes": []
+ },
+ "10.250.2.21:44818": {
+  "version": "33.011",
+  "run_state": "stop",
+  "online": true,
+  "health": "fault",
+  "model": "1756-L83E",
+  "serial": "SIM-CLX-0001",
+  "hardware": "Rev A",
+  "latency_ms": 9.1,
+  "facts": {
+   "Controller mode": "Faulted (program stopped)",
+   "Major faults": "1",
+   "Minor faults": "0",
+   "Owned / configured": "yes / yes",
+   "Memory used": "63 %",
+   "Last download": "11 h ago"
+  },
+  "events": [
+   {
+    "timestamp": "2026-10-10 09:37:06",
+    "severity": "error",
+    "code": "Type 4, Code 31",
+    "message": "Major fault: array subscript too large in routine 'Calc_Batch'",
+    "source": "MainProgram"
+   },
+   {
+    "timestamp": "2026-10-10 09:36:06",
+    "severity": "info",
+    "code": "",
+    "message": "Controller mode changed from RUN to FAULTED",
+    "source": "Controller"
+   },
+   {
+    "timestamp": "2026-10-09 22:59:06",
+    "severity": "info",
+    "code": "",
+    "message": "Controller download completed",
+    "source": "Engineering workstation"
+   }
+  ],
+  "notes": []
+ },
+ "10.250.2.22:44818": {
+  "version": "34.011",
+  "run_state": "run",
+  "online": true,
+  "health": "warning",
+  "model": "5069-L320ER",
+  "serial": "SIM-CLX-0002",
+  "hardware": "Rev B",
+  "latency_ms": 11.7,
+  "facts": {
+   "Controller mode": "Run",
+   "Minor faults": "2",
+   "Memory used": "58 %",
+   "SD card": "92 % full",
+   "Connections used": "74 of 120"
+  },
+  "events": [
+   {
+    "timestamp": "2026-10-10 09:09:06",
+    "severity": "warning",
+    "code": "",
+    "message": "Connection request error to module 'Rack2:3' (RPI 10 ms), connection timed out",
+    "source": "I/O tree"
+   },
+   {
+    "timestamp": "2026-10-10 04:59:06",
+    "severity": "warning",
+    "code": "",
+    "message": "Controller storage 92 % full on SD card",
+    "source": "Memory"
+   },
+   {
+    "timestamp": "2026-10-09 13:59:06",
+    "severity": "info",
+    "code": "",
+    "message": "Controller mode changed from PROGRAM to RUN",
+    "source": "Controller"
+   }
+  ],
+  "notes": []
+ },
+ "10.250.2.23:44818": {
+  "version": "12.013",
+  "run_state": "unknown",
+  "online": false,
+  "health": "unknown",
+  "model": "2080-LC50-48QWB",
+  "serial": "SIM-MCR-0003",
+  "hardware": "Rev A",
+  "latency_ms": 0.0,
+  "facts": {},
+  "events": [],
+  "notes": [
+   "Simulated device offline"
+  ]
+ },
+ "10.250.3.31:5007": {
+  "version": "1.23",
+  "run_state": "run",
+  "online": true,
+  "health": "warning",
+  "model": "R16CPU",
+  "serial": "SIM-IQR-0001",
+  "hardware": "Rev C",
+  "latency_ms": 7.8,
+  "facts": {
+   "CPU operating status": "RUN",
+   "Scan time (max)": "2.4 ms",
+   "Battery": "low (BAT LED on)",
+   "Program memory used": "49 %",
+   "Extension units": "1 base + 1 extension"
+  },
+  "events": [
+   {
+    "timestamp": "2026-10-10 08:54:06",
+    "severity": "warning",
+    "code": "",
+    "message": "Battery low: BAT LED on, retentive data at risk",
+    "source": "CPU"
+   },
+   {
+    "timestamp": "2026-10-10 08:53:06",
+    "severity": "warning",
+    "code": "2400H",
+    "message": "Module verify error: unit at slot 3 differs from registered configuration",
+    "source": "Base unit"
+   },
+   {
+    "timestamp": "2026-10-07 15:19:06",
+    "severity": "info",
+    "code": "",
+    "message": "Power on, CPU started in RUN",
+    "source": "CPU"
+   }
+  ],
+  "notes": []
+ },
+ "10.250.3.32:5007": {
+  "version": "1.280",
+  "run_state": "stop",
+  "online": true,
+  "health": "fault",
+  "model": "FX5U-32MT/ES",
+  "serial": "SIM-FX5-0002",
+  "hardware": "Rev B",
+  "latency_ms": 13.5,
+  "facts": {
+   "CPU operating status": "STOP (error)",
+   "Scan time (max)": "212 ms",
+   "Watchdog setting": "200 ms",
+   "Program memory used": "88 %"
+  },
+  "events": [
+   {
+    "timestamp": "2026-10-10 09:51:06",
+    "severity": "error",
+    "code": "",
+    "message": "Watchdog timer error: scan time exceeded 200 ms",
+    "source": "CPU"
+   },
+   {
+    "timestamp": "2026-10-10 09:51:06",
+    "severity": "error",
+    "code": "",
+    "message": "ERR LED on, CPU stopped",
+    "source": "CPU"
+   },
+   {
+    "timestamp": "2026-10-09 22:19:06",
+    "severity": "info",
+    "code": "",
+    "message": "Remote RUN executed from engineering tool",
+    "source": "Engineering workstation"
+   }
+  ],
+  "notes": []
+ },
+ "10.250.3.33:5007": {
+  "version": "A",
+  "run_state": "run",
+  "online": true,
+  "health": "ok",
+  "model": "Q03UDECPU",
+  "serial": "SIM-Q03-0003",
+  "hardware": "Rev D",
+  "latency_ms": 5.5,
+  "facts": {
+   "CPU operating status": "RUN",
+   "Scan time (max)": "6.1 ms",
+   "Battery": "OK"
+  },
+  "events": [
+   {
+    "timestamp": "2026-10-06 22:39:06",
+    "severity": "info",
+    "code": "",
+    "message": "Power on, CPU started in RUN",
+    "source": "CPU"
+   }
+  ],
+  "notes": []
+ },
+ "10.250.4.41:502": {
+  "version": "3.1.4",
+  "run_state": "run",
+  "online": true,
+  "health": "warning",
+  "model": "PM5650-2ETH",
+  "serial": "SIM-AC5-0001",
+  "hardware": "Rev B",
+  "latency_ms": 10.4,
+  "facts": {
+   "CPU state": "RUN",
+   "Cycle time (max)": "9 ms",
+   "I/O bus modules": "8 configured, 7 responding",
+   "SD card": "not detected"
+  },
+  "events": [
+   {
+    "timestamp": "2026-10-10 09:29:06",
+    "severity": "warning",
+    "code": "",
+    "message": "Diagnosis message: I/O bus module 3 not responding, retries exceeded",
+    "source": "I/O bus"
+   },
+   {
+    "timestamp": "2026-10-10 09:28:06",
+    "severity": "warning",
+    "code": "",
+    "message": "SD card not detected, boot project cannot be updated",
+    "source": "SD card"
+   },
+   {
+    "timestamp": "2026-10-08 07:59:06",
+    "severity": "info",
+    "code": "",
+    "message": "CPU started, boot project loaded",
+    "source": "CPU"
+   }
+  ],
+  "notes": []
+ },
+ "10.250.4.42:502": {
+  "version": "2.8.2",
+  "run_state": "run",
+  "online": true,
+  "health": "ok",
+  "model": "PM564-ETH",
+  "serial": "SIM-AC5-0002",
+  "hardware": "Rev A",
+  "latency_ms": 6.0,
+  "facts": {
+   "CPU state": "RUN",
+   "Cycle time (max)": "4 ms",
+   "I/O bus modules": "5 configured, 5 responding"
+  },
+  "events": [
+   {
+    "timestamp": "2026-10-06 05:59:06",
+    "severity": "info",
+    "code": "",
+    "message": "CPU started, boot project loaded",
+    "source": "CPU"
+   }
+  ],
+  "notes": []
+ },
+ "10.250.5.51:502": {
+  "version": "2.14",
+  "run_state": "stop",
+  "online": true,
+  "health": "fault",
+  "model": "AS332T-A",
+  "serial": "SIM-AS3-0001",
+  "hardware": "Rev A",
+  "latency_ms": 14.2,
+  "facts": {
+   "CPU state": "STOP (error)",
+   "Scan time (max)": "310 ms",
+   "Program memory used": "76 %"
+  },
+  "events": [
+   {
+    "timestamp": "2026-10-10 09:54:06",
+    "severity": "error",
+    "code": "D1004",
+    "message": "ERROR LED on: scan timeout, special register D1004 set",
+    "source": "CPU"
+   },
+   {
+    "timestamp": "2026-10-10 09:54:06",
+    "severity": "info",
+    "code": "",
+    "message": "Operating mode changed to STOP",
+    "source": "CPU"
+   }
+  ],
+  "notes": []
+ },
+ "10.250.5.52:502": {
+  "version": "1.62",
+  "run_state": "run",
+  "online": true,
+  "health": "warning",
+  "model": "DVP28SV11T2",
+  "serial": "SIM-DVP-0002",
+  "hardware": "Rev B",
+  "latency_ms": 12.0,
+  "facts": {
+   "CPU state": "RUN",
+   "Scan time (max)": "14 ms",
+   "RTC": "ok, battery low"
+  },
+  "events": [
+   {
+    "timestamp": "2026-10-10 07:59:06",
+    "severity": "warning",
+    "code": "",
+    "message": "RTC battery low, clock may reset on power loss",
+    "source": "RTC"
+   },
+   {
+    "timestamp": "2026-10-10 07:54:06",
+    "severity": "warning",
+    "code": "0x7F31",
+    "message": "Internal diagnostic event, no description available",
+    "source": "CPU"
+   }
+  ],
+  "notes": []
+ },
+ "10.250.6.61:502": {
+  "version": "03.09.07",
+  "run_state": "run",
+  "online": true,
+  "health": "warning",
+  "model": "750-8212",
+  "serial": "SIM-PFC-0001",
+  "hardware": "Rev 02",
+  "latency_ms": 9.6,
+  "facts": {
+   "CODESYS runtime": "running",
+   "CPU temperature": "78 C",
+   "CPU load": "57 %",
+   "RAM used": "64 %",
+   "SD card": "93 % full"
+  },
+  "events": [
+   {
+    "timestamp": "2026-10-10 09:41:06",
+    "severity": "warning",
+    "code": "",
+    "message": "CPU temperature 78 C above warning threshold 75 C",
+    "source": "System monitor"
+   },
+   {
+    "timestamp": "2026-10-10 05:39:06",
+    "severity": "warning",
+    "code": "",
+    "message": "Storage /media/sd 93 % full",
+    "source": "File system"
+   },
+   {
+    "timestamp": "2026-10-09 08:59:06",
+    "severity": "info",
+    "code": "",
+    "message": "Runtime started, application loaded",
+    "source": "CODESYS"
+   }
+  ],
+  "notes": []
+ },
+ "10.250.6.62:502": {
+  "version": "03.08.04",
+  "run_state": "run",
+  "online": true,
+  "health": "fault",
+  "model": "750-881",
+  "serial": "SIM-881-0002",
+  "hardware": "Rev 01",
+  "latency_ms": 8.3,
+  "facts": {
+   "CODESYS runtime": "running",
+   "I/O modules": "12 configured, 11 detected",
+   "I/O LED": "red blinking 6/3"
+  },
+  "events": [
+   {
+    "timestamp": "2026-10-10 09:56:06",
+    "severity": "error",
+    "code": "",
+    "message": "I/O-CHECK: terminal at position 5 missing, blink code 6/3",
+    "source": "I/O bus"
+   },
+   {
+    "timestamp": "2026-10-09 00:39:06",
+    "severity": "info",
+    "code": "",
+    "message": "Runtime started, application loaded",
+    "source": "CODESYS"
+   }
+  ],
+  "notes": []
+ }
+}
